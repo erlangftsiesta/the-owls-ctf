@@ -1,0 +1,33 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('user_answers', function (Blueprint $table) {
+            $table->id();
+            $table->string('username');
+            $table->text('flag');
+            $table->boolean('status'); // true or false
+            $table->integer('points');
+            $table->timestamps();
+
+            // Foreign key ke tabel users (pastikan kolom username adalah primary di tabel users)
+            $table->foreign('username')->references('username')->on('users')->onDelete('cascade');
+        });
+    }
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('user_answers');
+    }
+};
