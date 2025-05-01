@@ -33,7 +33,11 @@
                         </div>
                         <div class="mb-3">
                             <label for="kelas" class="form-label">Kelas</label>
-                            <input type="text" class="form-control" id="kelas" name="kelas" value="{{ old('kelas') }}" required>
+                            <select class="form-control" id="kelas" name="kelas" required>
+                                <option value="" disabled selected>Pilih Kelas</option>
+                                <option value="X-RPL-1" {{ old('kelas') == 'X-RPL-1' ? 'selected' : '' }}>X-RPL-1</option>
+                                <option value="X-RPL-2" {{ old('kelas') == 'X-RPL-2' ? 'selected' : '' }}>X-RPL-2</option>
+                            </select>
                         </div>
                         <div class="mb-3">
                             <label for="password" class="form-label">Password</label>

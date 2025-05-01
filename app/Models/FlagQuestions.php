@@ -11,6 +11,6 @@ class FlagQuestions extends Model
     protected $keyType = 'string';
 
     protected $fillable = [
-        'flag_id', 'title', 'description', 'attachment'
+        'flag_id', 'title', 'description', 'type', 'attachment'
     ];
 }

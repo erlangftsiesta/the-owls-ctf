@@ -8,6 +8,7 @@ class UserAnswers extends Model
 {
     protected $fillable = [
         'username',
+        'flag_id',
         'flag',
         'status',
         'points',

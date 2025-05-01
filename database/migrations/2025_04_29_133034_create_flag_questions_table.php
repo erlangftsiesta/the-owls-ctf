@@ -15,8 +15,12 @@ return new class extends Migration
             $table->string('flag_id')->primary();
             $table->string('title');
             $table->text('description');
-            $table->text('attachment')->nullable(); // untuk link atau path file
+            $table->string('type');  // 
+            $table->text('attachment')->nullable();
             $table->timestamps();
+    
+            // Tambahkan foreign key ke flag_types
+            $table->foreign('type')->references('type')->on('flag_types')->onDelete('cascade');
         });
     }
 

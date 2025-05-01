@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('user_answers', function (Blueprint $table) {
             $table->id();
             $table->string('username');
+            $table->string('flag_id');
             $table->text('flag');
             $table->boolean('status'); // true or false
             $table->integer('points');
@@ -21,6 +22,7 @@ return new class extends Migration
 
             // Foreign key ke tabel users (pastikan kolom username adalah primary di tabel users)
             $table->foreign('username')->references('username')->on('users')->onDelete('cascade');
+            $table->foreign('flag_id')->references('flag_id')->on('flag_questions')->onDelete('cascade');
         });
     }
     /**

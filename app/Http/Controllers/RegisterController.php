@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Users;
+use App\Models\UsersType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -27,6 +28,9 @@ class RegisterController extends Controller
             'nama_lengkap'  => $validated['nama_lengkap'],
             'kelas'         => $validated['kelas'],
             'password'      => Hash::make($validated['password']),
+        ]);
+        UsersType::create([
+            'username'      => $validated['username'],
         ]);
 
         return redirect()->route('login')->with('success', 'Registrasi berhasil, silakan login.');

@@ -29,11 +29,11 @@
             <tbody>
                 @foreach($flagTypes as $flagType)
                     <tr class="border-t border-b border-gray-600">
-                        <td class="px-6 py-4">{{ $flagType->id }}</td>
+                        <td class="px-6 py-4">{{ $flagType->type }}</td>
                         <td class="px-6 py-4">{{ $flagType->type }}</td>
                         <td class="px-6 py-4 text-center">
-                            <a href="{{ route('admin.flag_type.edit', $flagType->id) }}" class="text-yellow-500 hover:text-yellow-300">Edit</a>
-                            <form action="{{ route('admin.flag_type.destroy', $flagType->id) }}" method="POST" class="inline-block ml-4">
+                            <a href="{{ route('admin.flag_type.edit', $flagType->type) }}" class="text-yellow-500 hover:text-yellow-300">Edit</a>
+                            <form action="{{ route('admin.flag_type.destroy', $flagType->type) }}" method="POST" class="inline-block ml-4">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="text-red-500 hover:text-red-300">Hapus</button>

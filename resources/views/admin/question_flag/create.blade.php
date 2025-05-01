@@ -32,10 +32,20 @@
                 <textarea id="description" name="description" rows="4" class="w-full px-4 py-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-600" required></textarea>
             </div>
 
+            <!-- Type -->
+            <div class="mb-4">
+                <label for="description" class="block text-lg">Type</label>
+                <select class="form-control w-full px-4 py-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-600" required   " id="type" name="type" required>
+                    <option value="" disabled selected>Pilih Tipe</option>
+                    <option value="cryptography" {{ old('type') == 'cryptography' ? 'selected' : '' }}>cryptography</option>
+                    <option value="web-exploitation" {{ old('type') == 'web-exploitation' ? 'selected' : '' }}>web-exploitation</option>
+                </select>
+            </div>
+
             <!-- Attachment -->
             <div class="mb-4">
                 <label for="attachment" class="block text-lg">Attachment (Opsional)</label>
-                <input type="text" id="attachment" name="attachment" class="w-full px-4 py-2 rounded bg-gray-700 text-white focus:outline-none">
+                <input type="file" id="attachment" name="attachment" class="w-full px-4 py-2 rounded bg-gray-700 text-white focus:outline-none">
             </div>
 
             <!-- The Flag -->

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Flag DevRPL</title>
+    <title>The Owls CTF</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -31,29 +31,31 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <!-- Left side - Logo -->
-                <img src="{{ asset('images/TheOwlNav.png') }}" alt="">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0 font-bold text-lg md:text-xl">
+                <img src="{{ asset('images/TheOwlNav.png') }}" alt="Logo">
+                <div class="hidden md:flex items-center">
+                    <div class="font-bold text-lg md:text-xl">
                         The Owls
                     </div>
                 </div>
                 
                 <!-- Center - Title -->
                 <div class="hidden md:flex items-center justify-center flex-1">
-                    <h1 class="font-bold text-xl md:text-2xl lg:text-3xl text-white">The Flag DevRPL</h1>
+                    <h1 class="font-bold text-xl md:text-2xl lg:text-3xl text-white"></h1>
                 </div>
                 
                 <!-- Mobile title (shown on mobile only) -->
                 <div class="md:hidden flex items-center justify-center flex-1">
-                    <h1 class="font-bold text-lg text-white">The Flag DevRPL</h1>
+                    <h1 class="font-bold text-lg text-white"></h1>
                 </div>
                 
                 <!-- Right side - Profile Icon -->
                 <div class="flex items-center">
                     <div class="ml-4 flex items-center">
                         <button class="p-1 rounded-full text-gray-300 hover:text-white focus:outline-none">
-                            <span class="sr-only">Profile</span>
-                            <i class="fas fa-user-circle text-2xl"></i>
+                            <a href="{{ auth()->check() ? route('homepage') : route('login') }}" class="p-1 rounded-full text-gray-300 hover:text-white focus:outline-none">
+                                <span class="sr-only">Profile</span>
+                                <i class="fas fa-user-circle text-4xl"></i>
+                            </a>
                         </button>
                     </div>
                 </div>
@@ -69,7 +71,7 @@
 
                 <!-- Hero section -->
                 <div class="bg-discord-700 rounded-lg shadow-lg p-6 mb-8">
-                    <h2 class="text-2xl font-bold mb-4">Welcome to The Flag DevRPL CTF Challenge</h2>
+                    <h2 class="text-2xl font-bold mb-4">Welcome to The Owls CTF Challenge</h2>
                     <p class="mb-4">Join with us and test your skills in this cybersecurity challenge and capture the flag!</p>
                     <button class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded">
                         <a href="{{ route('login') }}" class="btn btn-link">Get it Now!</a>
@@ -79,31 +81,29 @@
                 
                 <!-- Challenge categories -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
-                    <!-- Challenge category 1 -->
+                    @foreach ($types as $type)
                     <div class="bg-discord-700 rounded-lg shadow-lg p-6">
                         <div class="flex items-center justify-between mb-4">
-                            <h3 class="text-xl font-bold">Web Exploitation</h3>
-                            <span class="bg-indigo-600 text-white text-xs font-semibold py-1 px-2 rounded-full">0 Challenges</span>
+                            <h3 class="text-xl font-bold">{{ ucfirst(str_replace('-', ' ', $type)) }}</h3>
+                            <span class="bg-indigo-600 text-white text-xs font-semibold py-1 px-2 rounded-full">
+                                {{ $challenge_counts[$type] }}
+                            </span>
                         </div>
-                        <p class="text-gray-300 mb-4">Test your skills in SQL injection, XSS, and other web vulnerabilities.</p>
+                        <p class="text-gray-300 mb-4">
+                            @if ($type === 'web-exploitation')
+                                Test your skills in SQL injection, XSS, and other web vulnerabilities.
+                            @elseif ($type === 'cryptography')
+                                Decrypt messages, crack codes, and solve cryptographic puzzles.
+                            @else
+                                Explore unique challenges in {{ $type }}.
+                            @endif
+                        </p>
                         <button class="text-indigo-400 hover:text-indigo-300 font-medium">
-                            <a href="{{ route('webex') }}">View Challenges →</a>
+                            <a href="{{ route('challenge.list', ['type' => $type]) }}">View Challenges →</a>
                         </button>
                     </div>
-                    
-                    <!-- Challenge category 2 -->
-                    <div class="bg-discord-700 rounded-lg shadow-lg p-6">
-                        <div class="flex items-center justify-between mb-4">
-                            <h3 class="text-xl font-bold">Cryptography</h3>
-                            <span class="bg-indigo-600 text-white text-xs font-semibold py-1 px-2 rounded-full">5 Challenges</span>
-                        </div>
-                        <p class="text-gray-300 mb-4">Decrypt messages, crack codes, and solve cryptographic puzzles.</p>
-                        <button class="text-indigo-400 hover:text-indigo-300 font-medium">
-                            <a href="{{ route('cryptography') }}">View Challenges →</a>
-                        </button>
-                    </div>
-                
-                </div>
+                @endforeach
+                </div>                
             </div>
         </div>
     </main>

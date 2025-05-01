@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\FlagQuestions;
+use App\Models\UserAnswers;
 use App\Models\TheFlag; // Import model TheFlag
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
 
 class FlagQuestionController extends Controller
 {
@@ -28,10 +30,16 @@ class FlagQuestionController extends Controller
         $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
-            'attachment' => 'nullable|text',
+            'attachment' => 'nullable|file',
+            'type' => 'required|string',
             'the_flag' => 'required|string', // Validasi untuk flag (jawaban)
         ]);
 
+        if ($request->hasFile('attachment')) {
+            $file = $request->file('attachment');
+            $path = $file->store('lampiran', 'public'); // ← ini WAJIB agar file pindah dari tmp ke storage
+            $data['attachment'] = $path; // ← simpan path ke DB
+        }
         // Buat flag_id unik menggunakan UUID
         $flagId = Str::uuid();
 
@@ -40,7 +48,8 @@ class FlagQuestionController extends Controller
             'flag_id' => $flagId,
             'title' => $request->title,
             'description' => $request->description,
-            'attachment' => $request->attachment,
+            'type' => $request->type,
+            'attachment' => $data['attachment'] ?? null,
         ]);
 
         // Simpan flag (jawaban) ke TheFlag dengan flag_id yang sama
@@ -52,12 +61,95 @@ class FlagQuestionController extends Controller
         return redirect()->route('admin.question_flag.index')->with('success', 'Soal dan flag berhasil ditambahkan.');
     }
 
-    // ✅ Menampilkan soal ke user (tanpa data sensitif)
-    public function show($id)
+    // Perbaikan: menambahkan $type ke compact dan mengirim data completedChallenges
+    public function listByType($type)
     {
-        $question = FlagQuestions::findOrFail($id);
-        return view('challenge.cryptography.show', compact('question'));
+        // Validasi tipe yang diizinkan
+        $allowedTypes = ['cryptography', 'web-exploitation'];
+        if (!in_array($type, $allowedTypes)) {
+            abort(404); // atau redirect ke halaman lain
+        }
+
+        $questions = FlagQuestions::where('type', $type)->get(); // Pastikan kamu punya kolom 'type' di tabel
+        
+        // Get completed challenges for current user
+        $completedChallenges = [];
+        if (Auth::check()) {
+            $completedChallenges = UserAnswers::where('username', Auth::user()->username)
+                ->where('status', 1) // Only get successful submissions
+                ->pluck('flag_id')
+                ->toArray();
+        }
+        
+        return view("challenge.$type.index", compact('questions', 'type', 'completedChallenges'));
     }
+
+    public function show($type, $id)
+    {
+        // Validasi tipe yang diizinkan
+        $allowedTypes = ['cryptography', 'web-exploitation'];
+        if (!in_array($type, $allowedTypes)) {
+            abort(404);
+        }
+    
+        // Cari berdasarkan flag_id jika memang itu yang dikirim di URL
+        $question = FlagQuestions::where('flag_id', $id)->first();
+        if (!$question) {
+            // Coba cari berdasarkan id biasa jika tidak ditemukan
+            $question = FlagQuestions::find($id);
+            if (!$question) {
+                abort(404);
+            }
+        }
+    
+        return view("challenge.$type.detail", compact('question', 'type'));
+    }
+    
+    public function submitFlag(Request $request, $type, $id)
+    {
+        $request->validate([
+            'flag' => 'required|string',
+        ]);
+    
+        $username = Auth::user()->username;
+        
+        // Use the $id from the route as the flag_id
+        $flagId = $id;
+        
+        // Find the flag
+        $correctFlag = TheFlag::where('flag_id', $flagId)->first();
+        
+        if (!$correctFlag) {
+            return redirect()->back()->with('error', 'Invalid flag ID');
+        }
+        
+        // Find the question to get points
+        $question = FlagQuestions::where('flag_id', $flagId)->first();
+        
+        // Check if flag is correct
+        $isCorrect = $correctFlag && $request->flag === $correctFlag->the_flag;
+        
+        // Set points to 100 if flag is correct, otherwise 0
+        $points = $isCorrect ? 100 : 0;
+    
+        try {
+            UserAnswers::create([
+                'username' => $username,
+                'flag_id' => $flagId,
+                'flag' => $request->flag,
+                'status' => $isCorrect ? 1 : 0,
+                'points' => $points, // Points set to 100 if correct, 0 if incorrect
+            ]);
+    
+            return redirect()->back()->with(
+                $isCorrect ? 'success' : 'error', 
+                $isCorrect ? 'Selamat! Flag benar.' : 'Flag salah. Coba lagi!'
+            );
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Gagal menyimpan jawaban: ' . $e->getMessage());
+        }
+    }
+    
 
     // ✅ Menampilkan form edit
     public function edit($id)

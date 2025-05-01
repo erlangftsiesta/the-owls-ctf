@@ -33,6 +33,15 @@ Route::resource('admin/flag_type', FlagTypeController::class)->names('admin.flag
 // Route yang butuh auth
 Route::middleware(['auth'])->group(function () {
     Route::resource('user', UsersController::class);
+    // List challenges by type
+    Route::get('/challenge/{type}', [FlagQuestionController::class, 'listByType'])
+        ->name('challenge.list');
     
-    Route::get('/challenge/cryptography/{id}', [FlagQuestionController::class, 'show'])->name('challenge.cryptography.show');
+    // Show a specific challenge
+    Route::get('/challenge/{type}/{id}', [FlagQuestionController::class, 'show'])
+        ->name('challenge.show');
+    
+    // Submit a flag for a challenge
+    Route::post('/challenge/{type}/{id}/submit', [FlagQuestionController::class, 'submitFlag'])
+        ->name('challenge.submit');
 });

@@ -6,7 +6,11 @@ use Illuminate\Http\Request;
 use App\Models\FlagType;
 
 class FlagTypeController extends Controller
-{
+{    
+    public function getRouteKeyName()
+    {
+        return 'type';
+    }
     // ✅ Menampilkan list tipe flag untuk admin
     public function index()
     {
